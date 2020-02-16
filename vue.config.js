@@ -24,7 +24,7 @@ const configuration = {
         config.resolve.alias.set('@views', resolve('src/views'));
         config.resolve.alias.set('@components', resolve('src/components'));
         config.resolve.alias.set('@service', resolve('src/service'));
-        config.resolve.alias.set('@api', resolve('src/api'));
+        config.resolve.alias.set('@apis', resolve('src/api'));
     },
     devServer: {
         port: PORT,
