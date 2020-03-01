@@ -1,12 +1,17 @@
 import {Container, interfaces} from 'inversify';
 import getDecoratiors from 'inversify-inject-decorators';
-import {InjectService} from '@/core/model/InjectService';
+import {ServiceIdModel} from '@/core/model/InjectService';
 import {InjectScopeType} from '@/enum/InjectScopeType';
+import ServiceIdentifier from '@/const/ServiceIdentifier';
+import { Config } from '../../public/config/Config';
 
 class ApplicationContainer {
-    private container: Container;
 
-    public constructor() {
+    private container: Container;
+    private config: Config
+
+    public constructor(
+    ) {
         this.container = new Container({defaultScope: 'Singleton'});
     }
 
@@ -14,21 +19,22 @@ class ApplicationContainer {
         return getDecoratiors(this.container);
     }
 
-    public setConfig(config: any) {
-        // this.config = config;
+    public setConfig(config: Config) {
+        this.config = config;
+        this.container.bind<Config>(ServiceIdentifier.Configuration).toConstantValue(this.config);
     }
 
-    public setService(services: Array<InjectService>) {
+    public setService(services: Array<ServiceIdModel>) {
         for(const injectService of services) {
             this.registeService(injectService);
         }
     }
     
-    public registeService<T>(service: InjectService): void {
+    public registeService<T>(service: ServiceIdModel): void {
         const invokeService: interfaces.BindingWhenOnSyntax<T> = this.bindService(service);
     }
 
-    private bindService<T>(service: InjectService): interfaces.BindingWhenOnSyntax<T> {
+    private bindService<T>(service: ServiceIdModel): interfaces.BindingWhenOnSyntax<T> {
         let bindingWhenOnSyntax: interfaces.BindingWhenOnSyntax<T>;
 
         switch(service.scope) {
