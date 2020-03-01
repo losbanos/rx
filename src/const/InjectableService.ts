@@ -1,4 +1,4 @@
-import { ServiceIdModel } from '@/core/model/InjectService';
+import { ServiceIdModel } from '@/core/model/ServiceInjectData';
 
-export const servce: Array<ServiceIdModel> = [
+export const services: Array<ServiceIdModel> = [
 ]

@@ -1,6 +1,6 @@
 import {Container, interfaces} from 'inversify';
 import getDecoratiors from 'inversify-inject-decorators';
-import {ServiceIdModel} from '@/core/model/InjectService';
+import {ServiceInjectData} from '@/core/model/ServiceInjectData';
 import {InjectScopeType} from '@/enum/InjectScopeType';
 import ServiceIdentifier from '@/const/ServiceIdentifier';
 import { Config } from '../../public/config/Config';
@@ -24,17 +24,17 @@ class ApplicationContainer {
         this.container.bind<Config>(ServiceIdentifier.Configuration).toConstantValue(this.config);
     }
 
-    public setService(services: Array<ServiceIdModel>) {
+    public setService(services: Array<ServiceInjectData>) {
         for(const injectService of services) {
             this.registeService(injectService);
         }
     }
     
-    public registeService<T>(service: ServiceIdModel): void {
-        const invokeService: interfaces.BindingWhenOnSyntax<T> = this.bindService(service);
+    public registeService<T>(services: ServiceInjectData): void {
+        const invokeService: interfaces.BindingWhenOnSyntax<T> = this.bindService(services);
     }
 
-    private bindService<T>(service: ServiceIdModel): interfaces.BindingWhenOnSyntax<T> {
+    private bindService<T>(service: ServiceInjectData): interfaces.BindingWhenOnSyntax<T> {
         let bindingWhenOnSyntax: interfaces.BindingWhenOnSyntax<T>;
 
         switch(service.scope) {
