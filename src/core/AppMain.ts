@@ -1,11 +1,13 @@
 import Vue from 'vue';
 import App from '@/App.vue';
 import router from '@/router';
+import {IAppMain} from '@/core/interface/IAppMain';
+
 Vue.config.productionTip = false;
 
-export class ApplicationMain {
+export class AppMain  implements IAppMain{
 
-    public ApplicationMain() {
+    public constructor() {
 
     }
 

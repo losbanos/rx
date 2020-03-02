@@ -1,8 +1,9 @@
-import { ApplicationInitator } from './core/ApplicationInitator';
-import { ApplicationMain } from './core/ApplicationMain';
+import { ApplicationInitator } from './core/AppInitator';
+import { AppMain } from './core/AppMain';
 
 new ApplicationInitator(
-    ApplicationMain,
-    {}, []
+    AppMain,
+    {},
+    []
 ).init();
 

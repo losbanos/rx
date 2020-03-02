@@ -1,6 +1,6 @@
 import {Container, interfaces} from 'inversify';
 import getDecoratiors from 'inversify-inject-decorators';
-import {ServiceInjectData} from '@/core/model/ServiceInjectData';
+import {ServiceInjectData} from '@/core/interface/IServiceInjectData';
 import {InjectScopeType} from '@/enum/InjectScopeType';
 import ServiceIdentifier from '@/const/ServiceIdentifier';
 import { Config } from '../../public/config/Config';
