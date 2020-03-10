@@ -16,7 +16,8 @@ module.exports = {
         'arrow-parens': [2, 'as-needed'],
         'object-curly-spacing': ['error', 'never'],
         'max-len': 'off',
-        'class-methods-use-this': 'off'
+        'class-methods-use-this': 'off',
+        'padded-blocks': ['error', {'blocks': 'never'}]
     },
     parserOptions: {
         parser: '@typescript-eslint/parser',

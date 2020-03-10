@@ -1,28 +1,28 @@
 import { IServiceInjectData } from './interface/IServiceInjectData';
-import {applicationContainer} from './AppContainer';
-
-import { Config } from 'public/config/Config';
+import { appContainer } from './AppContainer';
+import { IConfig } from 'public/config/model/IConfig';
+import { AppConfig } from 'src/core/AppConfig';
 
 export class ApplicationInitator {
 
-    private AppMain: Class;
+    private MainComponent: Class;
+    private config: AppConfig;
 
-    public constructor(AppMain: Class, config: any, service: Array<IServiceInjectData>) {
-
-        this.AppMain = AppMain;
-        this.setConfig(config);
-        this.setService(service);
+    public constructor(MainComponent: Class, config: Array<IConfig>) {
+        this.MainComponent = MainComponent;
+        this.config = new AppConfig(config);
     }
 
-    public setConfig(config: Config) {
-        applicationContainer.setConfig(config);
+    public bindConfigToAppContainer(config: IConfig) {
+        appContainer.bindConfig(config);
     }
 
-    public setService(services: Array<IServiceInjectData>): void {
-        applicationContainer.setService(services);
+    public setService(services: Array<IServiceInjectData>): ApplicationInitator {
+        appContainer.bindService(services);
+        return this;
     }
 
     public init() {
-        new this.AppMain().init();
+        new this.MainComponent().init();
     }
 }

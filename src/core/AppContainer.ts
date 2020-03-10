@@ -1,14 +1,14 @@
 import {Container, interfaces} from 'inversify';
 import getDecoratiors from 'inversify-inject-decorators';
-import {ServiceInjectData} from '@/core/interface/IServiceInjectData';
+import {IServiceInjectData} from '@/core/interface/IServiceInjectData';
 import {InjectScopeType} from '@/enum/InjectScopeType';
 import ServiceIdentifier from '@/const/ServiceIdentifier';
-import { Config } from '../../public/config/Config';
+import { IConfig } from 'public/config/model/IConfig';
 
-class ApplicationContainer {
+class AppContainer {
 
     private container: Container;
-    private config: Config
+    private config: IConfig
 
     public constructor(
     ) {
@@ -19,43 +19,48 @@ class ApplicationContainer {
         return getDecoratiors(this.container);
     }
 
-    public setConfig(config: Config) {
+    public bindConfig(config: IConfig) {
         this.config = config;
-        this.container.bind<Config>(ServiceIdentifier.Configuration).toConstantValue(this.config);
+        this.container.bind<IConfig>(ServiceIdentifier.Configuration).toConstantValue(this.config);
     }
 
-    public setService(services: Array<ServiceInjectData>) {
+    public bindService(services: Array<IServiceInjectData>) {
         for(const injectService of services) {
             this.registeService(injectService);
         }
     }
     
-    public registeService<T>(services: ServiceInjectData): void {
-        const invokeService: interfaces.BindingWhenOnSyntax<T> = this.bindService(services);
+    public registeService<T>(service: IServiceInjectData): void {
+        const invokeService: interfaces.BindingWhenOnSyntax<T> = this.bindServiceToContainer<T>(service);
+        this.addActivationHandler<T>(invokeService, service);
     }
 
-    private bindService<T>(service: ServiceInjectData): interfaces.BindingWhenOnSyntax<T> {
+    private bindServiceToContainer<T>(service: IServiceInjectData): interfaces.BindingWhenOnSyntax<T> {
+        const bindingInWhenOnSyntax: interfaces.BindingInWhenOnSyntax<T> = this.container.bind<T>(service.name).to(service.service);
         let bindingWhenOnSyntax: interfaces.BindingWhenOnSyntax<T>;
 
         switch(service.scope) {
-            case InjectScopeType.Transient:
-                bindingWhenOnSyntax = this.container.bind<T>(service.name).to(service.service).inTransientScope();
-                break;
             case InjectScopeType.Singleton:
-                bindingWhenOnSyntax = this.container.bind<T>(service.name).to(service.service).inSingletonScope();
+                bindingWhenOnSyntax = bindingInWhenOnSyntax.inSingletonScope();
                 break;
             case InjectScopeType.Request:
-                bindingWhenOnSyntax = this.container.bind<T>(service.name).to(service.service).inRequestScope();
+                bindingWhenOnSyntax = bindingInWhenOnSyntax.inRequestScope();
                 break;
             default:
-                bindingWhenOnSyntax = this.container.bind<T>(service.name).to(service.service).inTransientScope();
+                bindingWhenOnSyntax = bindingInWhenOnSyntax.inTransientScope();
                 break;
         }
         return bindingWhenOnSyntax;
     }
+
+    private addActivationHandler<T>(invokeService: interfaces.BindingWhenOnSyntax<T>, service: IServiceInjectData): void {
+        if (service.handler) {
+            invokeService.onActivation(service.handler);
+        }
+    }
 }
 
-const applicationContainer: ApplicationContainer = new ApplicationContainer();
-const {lazyInject, lazyInjectNamed} = applicationContainer.lazyInject();
+const appContainer: AppContainer = new AppContainer();
+const {lazyInject, lazyInjectNamed} = appContainer.lazyInject();
 
-export {applicationContainer, lazyInject, lazyInjectNamed};
+export {appContainer, lazyInject, lazyInjectNamed};
