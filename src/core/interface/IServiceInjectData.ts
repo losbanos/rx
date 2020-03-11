@@ -5,5 +5,5 @@ export interface IServiceInjectData {
      name: string | symbol;
      service: any;
      scope?: InjectScopeType;
-     handler?:  (context: interfaces.Context, injectable: any) => any; 
+     handler?: (context: interfaces.Context, injectable: any) => any;
 }

@@ -5,16 +5,17 @@ import {IAppMain} from '@/core/interface/IAppMain';
 
 Vue.config.productionTip = false;
 
-export class AppMain  implements IAppMain{
+export default class AppMain implements IAppMain {
 
     public constructor() {
-
+        /* tslint:disable-no-empty-block */
     }
 
     public init() {
         new Vue({
             router,
-            render: h => h(App)
+            render: (h) => h(App)
         }).$mount('#app');
     }
 }
+

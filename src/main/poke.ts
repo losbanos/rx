@@ -4,5 +4,5 @@ import Poke from '@views/poke/Poke.vue';
 
 new Vue({
     router,
-    render: h => h(Poke)
+    render: (h) => h(Poke)
 }).$mount('#poke');

@@ -1,14 +1,14 @@
-import { ApplicationInitator } from './core/AppInitator';
-import { AppMain } from './core/AppMain';
-import { config } from 'public/config/Config';
-import { services } from './const/InjectableService';
-import { ImageConfig } from 'src/config/ImageConfig';
+import AppInitator from './core/AppInitator';
+import AppMain from './core/AppMain';
+import {services} from './const/InjectableService';
+import {ImageConfig} from '@/config/ImageConfig';
 
-new ApplicationInitator(
-    AppMain, config: [
+new AppInitator(
+    AppMain,
+    [
         {key: 'image', config: ImageConfig}
     ])
     .setService([
-        services
+        ...services
     ]).init();
 

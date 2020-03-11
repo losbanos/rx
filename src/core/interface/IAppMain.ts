@@ -2,5 +2,5 @@ export interface IAppMain {
     /**
      * init
      */
-    init(): void
+    init(): void;
 }

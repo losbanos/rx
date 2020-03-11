@@ -3,12 +3,12 @@ import getDecoratiors from 'inversify-inject-decorators';
 import {IServiceInjectData} from '@/core/interface/IServiceInjectData';
 import {InjectScopeType} from '@/enum/InjectScopeType';
 import ServiceIdentifier from '@/const/ServiceIdentifier';
-import { IConfig } from 'public/config/model/IConfig';
+import {IConfig} from '@/core/interface/IConfig';
 
 class AppContainer {
 
     private container: Container;
-    private config: IConfig
+    private config: IConfig;
 
     public constructor(
     ) {
@@ -25,11 +25,11 @@ class AppContainer {
     }
 
     public bindService(services: Array<IServiceInjectData>) {
-        for(const injectService of services) {
+        for (const injectService of services) {
             this.registeService(injectService);
         }
     }
-    
+
     public registeService<T>(service: IServiceInjectData): void {
         const invokeService: interfaces.BindingWhenOnSyntax<T> = this.bindServiceToContainer<T>(service);
         this.addActivationHandler<T>(invokeService, service);
@@ -39,16 +39,10 @@ class AppContainer {
         const bindingInWhenOnSyntax: interfaces.BindingInWhenOnSyntax<T> = this.container.bind<T>(service.name).to(service.service);
         let bindingWhenOnSyntax: interfaces.BindingWhenOnSyntax<T>;
 
-        switch(service.scope) {
-            case InjectScopeType.Singleton:
-                bindingWhenOnSyntax = bindingInWhenOnSyntax.inSingletonScope();
-                break;
-            case InjectScopeType.Request:
-                bindingWhenOnSyntax = bindingInWhenOnSyntax.inRequestScope();
-                break;
-            default:
-                bindingWhenOnSyntax = bindingInWhenOnSyntax.inTransientScope();
-                break;
+        switch (service.scope) {
+            case InjectScopeType.Singleton: bindingWhenOnSyntax = bindingInWhenOnSyntax.inSingletonScope(); break;
+            case InjectScopeType.Request: bindingWhenOnSyntax = bindingInWhenOnSyntax.inRequestScope(); break;
+            default: bindingWhenOnSyntax = bindingInWhenOnSyntax.inTransientScope(); break;
         }
         return bindingWhenOnSyntax;
     }

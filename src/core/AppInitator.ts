@@ -1,11 +1,12 @@
-import { IServiceInjectData } from './interface/IServiceInjectData';
-import { appContainer } from './AppContainer';
-import { IConfig } from 'public/config/model/IConfig';
-import { AppConfig } from 'src/core/AppConfig';
+import {IServiceInjectData} from './interface/IServiceInjectData';
+import {appContainer} from './AppContainer';
+import {AppConfig} from '@/core/AppConfig';
+import {IConfig} from '@/core/interface/IConfig';
 
-export class ApplicationInitator {
+export default class AppInitator {
 
     private MainComponent: Class;
+
     private config: AppConfig;
 
     public constructor(MainComponent: Class, config: Array<IConfig>) {
@@ -17,12 +18,13 @@ export class ApplicationInitator {
         appContainer.bindConfig(config);
     }
 
-    public setService(services: Array<IServiceInjectData>): ApplicationInitator {
+    public setService(services: Array<IServiceInjectData>): AppInitator {
         appContainer.bindService(services);
         return this;
     }
 
     public init() {
-        new this.MainComponent().init();
+        this.config.init();
+        // new this.MainComponent().init();
     }
 }
