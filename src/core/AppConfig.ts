@@ -35,13 +35,35 @@ export class AppConfig {
                 for (const item of this.optionConfigs) {
                     baseConfig[item.key] = item.config;
                 }
+                this.config = baseConfig;
+                console.log('IOS = ', this.getItem('DEVICE1S.IOS'));
             },
             (e) => {
                 console.error('error = ', e);
             }
         );
+
     }
-    public setConfig(config: Array<IConfig>) {
-        // tslint-disable:no-empty-block
+
+    public getItem(key: string): string {
+        const keys: Array<string> = key.split('.');
+        let result: any;
+        try {
+            result = this.searchConfig(keys, this.config);
+        } catch (e) {
+            console.error('e = ', e);
+        }
+
+        return result;
     }
+
+    private searchConfig(props: Array<any>, config: any): string {
+        let v: any = config[props.shift()];
+        if (props.length > 0) {
+            v = this.searchConfig(props, v);
+        }
+        return v;
+    }
+
+
 }
