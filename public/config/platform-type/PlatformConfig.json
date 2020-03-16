@@ -1,0 +1,21 @@
+{
+    "TOP_NODE": "#wrapper",
+    "DEVICES": {
+        "IOS": {
+            "USE_TOUCH_MOVE": true,
+            "TARGET_RESOLUTION": []
+        },
+        "ANDROID": {
+            "USE_TOUCH_MOVE": true,
+            "TARGET_RESOLUTION": []
+        },
+        "TABLET": {
+            "USE_TOUCH_MOVE": true,
+            "TARGET_RESOLUTION": []
+        },
+        "PC": {
+            "USE_TOUCH_MOVE": false,
+            "TARGET_RESOLUTION": []
+        }
+    }
+}

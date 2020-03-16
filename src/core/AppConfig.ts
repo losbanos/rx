@@ -1,37 +1,45 @@
 import { IConfig } from '@/core/interface/IConfig';
 import { Response } from '@/core/interface/Response';
 import axios from 'axios';
+import deepMerge from 'deepmerge';
 
-const configLoader = () => {
+const configLoader: Promise<Array<any>> = (() => {
     const configs: Array<any> = [
         new Promise((resolve, reject) => {
-            axios.get('public/config/env-type/EnvConfig.json')
+            axios.get('/config/env-type/EnvConfig.json')
             .then((res: Response) => resolve(res.data))
-            .catch((e: any) => resolve({}));
+            .catch((e: any) => reject({}));
         }),
         new Promise((resolve, reject) => {
-            axios.get('public/config/platform-type/PlatformConfig.json')
-            .then((res: Response) => res.data)
-            .catch((e: any) => resolve({}));
+            axios.get('/config/platform-type/PlatformConfig.json')
+            .then((res: Response) => resolve(res.data))
+            .catch((e: any) => reject({}));
         })
     ];
-
     return Promise.all(configs);
-};
+})();
 
 export class AppConfig {
-    constructor(
-        config: Array<IConfig>
-    ) {
-        // tslint:disable:no-empty-block;
+
+    private config: any = {};
+    private optionConfigs: Array<IConfig>;
+
+    constructor(optionConfigs: Array<IConfig>) {
+        this.optionConfigs = optionConfigs;
     }
 
-    /**
-     * init
-     */
     public init() {
-        const defaultConfig: Promise<any> = configLoader();
-        // console.log(defaultConfig);
+        configLoader.then(
+            ([envConfig, platformConfig]) => {
+                const baseConfig: any = deepMerge.all([process.env, envConfig, platformConfig]);
+                for (const item of this.optionConfigs) {
+                    baseConfig[item.key] = item.config;
+                }
+            },
+            (e) => {
+                console.error('error = ', e);
+            }
+        );
     }
     public setConfig(config: Array<IConfig>) {
         // tslint-disable:no-empty-block
