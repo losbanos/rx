@@ -1,4 +1,5 @@
 import { IConfig } from '@/core/interface/IConfig';
+import { IAppConfig } from '@/core/interface/IAppConfig';
 import { Response } from '@/core/interface/Response';
 import axios from 'axios';
 import deepMerge from 'deepmerge';
@@ -19,7 +20,7 @@ const configLoader: Promise<Array<any>> = (() => {
     return Promise.all(configs);
 })();
 
-export class AppConfig {
+export class AppConfig implements IAppConfig {
 
     private config: any = {};
     private optionConfigs: Array<IConfig>;
@@ -28,21 +29,19 @@ export class AppConfig {
         this.optionConfigs = optionConfigs;
     }
 
-    public init() {
-        configLoader.then(
+    public init(): Promise<any> {
+        return configLoader.then(
             ([envConfig, platformConfig]) => {
                 const baseConfig: any = deepMerge.all([process.env, envConfig, platformConfig]);
                 for (const item of this.optionConfigs) {
                     baseConfig[item.key] = item.config;
                 }
-                this.config = baseConfig;
-                console.log('IOS = ', this.getItem('DEVICE1S.IOS'));
+                return this.config = baseConfig;
             },
             (e) => {
                 console.error('error = ', e);
             }
         );
-
     }
 
     public getItem(key: string): string {

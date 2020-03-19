@@ -15,6 +15,7 @@
     "inversify-dts": "^3.0.0",
     "inversify-inject-decorators": "^3.1.0",
     "reflect-metadata": "^0.1.13",
+    "rxjs": "^6.5.4",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
     "vue-property-decorator": "^8.3.0",

@@ -1,7 +1,7 @@
-import {IServiceInjectData} from '@/core/interface/IServiceInjectData';
+import {IInjectService} from '@/core/interface/IInjectService';
 import ServiceIdentifier from './ServiceIdentifier';
 import {PokeService} from '@/service/PokeService';
 
-export const services: Array<IServiceInjectData> = [
+export const services: Array<IInjectService> = [
     {name: ServiceIdentifier.PokeService, service: PokeService}
 ];

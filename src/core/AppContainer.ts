@@ -1,14 +1,14 @@
 import {Container, interfaces} from 'inversify';
 import getDecoratiors from 'inversify-inject-decorators';
-import {IServiceInjectData} from '@/core/interface/IServiceInjectData';
+import {IInjectService} from '@/core/interface/IInjectService';
 import {InjectScopeType} from '@/enum/InjectScopeType';
 import ServiceIdentifier from '@/const/ServiceIdentifier';
-import {IConfig} from '@/core/interface/IConfig';
+import {IAppConfig} from '@/core/interface/IAppConfig';
 
 class AppContainer {
 
     private container: Container;
-    private config: IConfig;
+    private config: IAppConfig;
 
     public constructor(
     ) {
@@ -19,23 +19,23 @@ class AppContainer {
         return getDecoratiors(this.container);
     }
 
-    public bindConfig(config: IConfig) {
+    public bindConfig(config: IAppConfig) {
         this.config = config;
-        this.container.bind<IConfig>(ServiceIdentifier.Configuration).toConstantValue(this.config);
+        this.container.bind<IAppConfig>(ServiceIdentifier.Configuration).toConstantValue(this.config);
     }
 
-    public bindService(services: Array<IServiceInjectData>) {
+    public bindService(services: Array<IInjectService>) {
         for (const injectService of services) {
             this.registeService(injectService);
         }
     }
 
-    public registeService<T>(service: IServiceInjectData): void {
+    public registeService<T>(service: IInjectService): void {
         const invokeService: interfaces.BindingWhenOnSyntax<T> = this.bindServiceToContainer<T>(service);
         this.addActivationHandler<T>(invokeService, service);
     }
 
-    private bindServiceToContainer<T>(service: IServiceInjectData): interfaces.BindingWhenOnSyntax<T> {
+    private bindServiceToContainer<T>(service: IInjectService): interfaces.BindingWhenOnSyntax<T> {
         const bindingInWhenOnSyntax: interfaces.BindingInWhenOnSyntax<T> = this.container.bind<T>(service.name).to(service.service);
         let bindingWhenOnSyntax: interfaces.BindingWhenOnSyntax<T>;
 
@@ -47,7 +47,7 @@ class AppContainer {
         return bindingWhenOnSyntax;
     }
 
-    private addActivationHandler<T>(invokeService: interfaces.BindingWhenOnSyntax<T>, service: IServiceInjectData): void {
+    private addActivationHandler<T>(invokeService: interfaces.BindingWhenOnSyntax<T>, service: IInjectService): void {
         if (service.handler) {
             invokeService.onActivation(service.handler);
         }

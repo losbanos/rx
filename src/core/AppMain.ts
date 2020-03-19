@@ -11,11 +11,18 @@ export default class AppMain implements IAppMain {
         /* tslint:disable-no-empty-block */
     }
 
-    public init() {
+    public load() {
         new Vue({
             router,
             render: (h) => h(App)
         }).$mount('#app');
+    }
+
+    /**
+     * init
+     */
+    public init() {
+        // tslint-disable:no-empty-block
     }
 }
 

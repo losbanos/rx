@@ -1,7 +1,7 @@
 import {InjectScopeType} from '@/enum/InjectScopeType';
 import { interfaces } from 'inversify';
 
-export interface IServiceInjectData {
+export interface IInjectService {
      name: string | symbol;
      service: any;
      scope?: InjectScopeType;
