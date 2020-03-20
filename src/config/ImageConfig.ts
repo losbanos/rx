@@ -1,5 +1,6 @@
-export const ImageConfig = {
-    baseUrl: '',
-    extentions: ['jpg', 'jpeg'],
-    maxSize: 1024
+
+export const imageConfig = {
+    BASE_URL: '',
+    EXTENSIONS: ['jpg', 'jpeg'],
+    MAX_SIZE: 1024
 };

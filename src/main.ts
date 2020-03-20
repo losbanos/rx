@@ -1,12 +1,13 @@
-import AppInitator from './core/AppInitator';
-import AppMain from './core/AppMain';
+import 'reflect-metadata';
+import ApplicationExecutor from './core/ApplicationExecutor';
+import ApplicationMain from './core/ApplicationMain';
 import {services} from './const/InjectableService';
-import {ImageConfig} from '@/config/ImageConfig';
+import {imageConfig} from '@/config/ImageConfig.ts';
 
-new AppInitator(
-    AppMain,
+new ApplicationExecutor(
+    ApplicationMain,
     [
-        {key: 'image', config: ImageConfig}
+        {key: 'IMAGE', config: imageConfig}
     ])
     .setService([
         ...services

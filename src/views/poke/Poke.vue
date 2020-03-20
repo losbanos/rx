@@ -1,5 +1,5 @@
 <template>
-    <div id="pokeView"></div>
+    <div id="poke"></div>
 </template>
 
 <script lang="ts" src="./Poke.ts"></script>

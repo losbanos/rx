@@ -25,12 +25,13 @@ const configuration = {
         config.resolve.alias.set('@components', resolve('src/components'));
         config.resolve.alias.set('@service', resolve('src/service'));
         config.resolve.alias.set('@apis', resolve('src/api'));
+        config.resolve.alias.set('@core', resolve('src/core'));
     },
     devServer: {
         port: PORT,
         historyApiFallback: {
             rewrites: [
-                {from: /^\/poke\/?.*/, to: path.posix.join('/', 'poke.html')},
+                // {from: /^\/poke\/?.*/, to: path.posix.join('/', 'poke.html')},
                 {from: /./, to: path.posix.join('/', 'index.html')}
             ]
         }

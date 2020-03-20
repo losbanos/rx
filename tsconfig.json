@@ -35,6 +35,9 @@
       ],
       "@apis/*": [
         "src/apis/*"
+      ],
+      "@core/*": [
+        "src/core/*"
       ]
     },
     "lib": [

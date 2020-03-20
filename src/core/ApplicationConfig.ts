@@ -1,6 +1,6 @@
-import { IConfig } from '@/core/interface/IConfig';
-import { IAppConfig } from '@/core/interface/IAppConfig';
-import { Response } from '@/core/interface/Response';
+import { IConfigItem } from '@core/interface/IConfigItem';
+import { IApplicationConfig } from '@core/interface/IApplicationConfig';
+import { Response } from '@core/interface/Response';
 import axios from 'axios';
 import deepMerge from 'deepmerge';
 
@@ -20,12 +20,12 @@ const configLoader: Promise<Array<any>> = (() => {
     return Promise.all(configs);
 })();
 
-export class AppConfig implements IAppConfig {
+export class ApplicationConfig implements IApplicationConfig {
 
     private config: any = {};
-    private optionConfigs: Array<IConfig>;
+    private optionConfigs: Array<IConfigItem>;
 
-    constructor(optionConfigs: Array<IConfig>) {
+    constructor(optionConfigs: Array<IConfigItem>) {
         this.optionConfigs = optionConfigs;
     }
 
@@ -44,7 +44,7 @@ export class AppConfig implements IAppConfig {
         );
     }
 
-    public getItem(key: string): string {
+    public getItem(key: string): any {
         const keys: Array<string> = key.split('.');
         let result: any;
         try {
@@ -52,7 +52,6 @@ export class AppConfig implements IAppConfig {
         } catch (e) {
             console.error('e = ', e);
         }
-
         return result;
     }
 
@@ -63,6 +62,4 @@ export class AppConfig implements IAppConfig {
         }
         return v;
     }
-
-
 }

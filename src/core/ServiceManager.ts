@@ -2,13 +2,13 @@ import {Container, interfaces} from 'inversify';
 import getDecoratiors from 'inversify-inject-decorators';
 import {IInjectService} from '@/core/interface/IInjectService';
 import {InjectScopeType} from '@/enum/InjectScopeType';
-import ServiceIdentifier from '@/const/ServiceIdentifier';
-import {IAppConfig} from '@/core/interface/IAppConfig';
+import ServiceInjectId from '@/const/ServiceInjectId';
+import {IApplicationConfig} from '@/core/interface/IApplicationConfig';
 
-class AppContainer {
+class ServiceManager {
 
     private container: Container;
-    private config: IAppConfig;
+    private config: IApplicationConfig;
 
     public constructor(
     ) {
@@ -19,9 +19,9 @@ class AppContainer {
         return getDecoratiors(this.container);
     }
 
-    public bindConfig(config: IAppConfig) {
+    public bindConfig(config: IApplicationConfig) {
         this.config = config;
-        this.container.bind<IAppConfig>(ServiceIdentifier.Configuration).toConstantValue(this.config);
+        this.container.bind<IApplicationConfig>(ServiceInjectId.Configuration).toConstantValue(this.config);
     }
 
     public bindService(services: Array<IInjectService>) {
@@ -54,7 +54,7 @@ class AppContainer {
     }
 }
 
-const appContainer: AppContainer = new AppContainer();
-const {lazyInject, lazyInjectNamed} = appContainer.lazyInject();
+const serviceManager: ServiceManager = new ServiceManager();
+const {lazyInject, lazyInjectNamed} = serviceManager.lazyInject();
 
-export {appContainer, lazyInject, lazyInjectNamed};
+export {serviceManager, lazyInject, lazyInjectNamed};
