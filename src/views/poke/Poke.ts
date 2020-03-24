@@ -16,6 +16,10 @@ export default class Poke extends Vue {
     }
 
     protected mounted() {
+        // this.testUser();
+    }
+
+    private testUser() {
         const user: User = new User();
         const system: System = new System(user);
 

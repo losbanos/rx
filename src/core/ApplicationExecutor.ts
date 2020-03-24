@@ -26,8 +26,8 @@ export default class ApplicationExecutor {
     public init() {
         zip(from(this.config.init()), fromEvent(document, 'DOMContentLoaded')).subscribe(
             ([config, result]: [any, Event]) => {
-                console.log('config = ', config);
-                console.log('result = ', result);
+                // console.log('config = ', config);
+                // console.log('result = ', result);
                 this.execApp();
             },
             (e) => {
