@@ -23,6 +23,18 @@ export default new VueRouter({
             path: '/poke',
             name: 'Poke',
             component: () => import('@views/poke/Poke.vue')
+        },
+        {
+            path: '/rxjs',
+            name: 'RxJs',
+            component: () => import ('@views/rxjs/ViewRx.vue'),
+            children: [
+                {
+                    path: 'news',
+                    name: 'News',
+                    component: () => import('@views/rxjs/News.vue')
+                }
+            ]
         }
     ]
 });
