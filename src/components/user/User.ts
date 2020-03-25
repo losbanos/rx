@@ -1,9 +1,11 @@
 import {IUser} from '@components/user/IUser';
+import {BasicSubject} from '@components/subject/BasicSubject';
 
-export class User {
+export class User extends BasicSubject {
     private state: IUser;
 
     constructor() {
+        super();
         this.state = {
             name: 'Kimtaehoon',
             isLogin: false
@@ -23,6 +25,7 @@ export class User {
             name,
             isLogin: true
         };
+        this.notify(this.state);
     }
 
     public logout() {
@@ -30,5 +33,6 @@ export class User {
             name: '',
             isLogin: false
         };
+        this.notify(this.state);
     }
 }

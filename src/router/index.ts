@@ -33,6 +33,11 @@ export default new VueRouter({
                     path: 'news',
                     name: 'News',
                     component: () => import('@views/rxjs/News.vue')
+                },
+                {
+                    path: 'system',
+                    name: 'System',
+                    component: () => import('@views/rxjs/SystemView.vue')
                 }
             ]
         }
