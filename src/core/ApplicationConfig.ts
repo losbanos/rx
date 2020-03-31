@@ -38,7 +38,7 @@ export class ApplicationConfig implements IApplicationConfig {
                 }
                 return this.config = baseConfig;
             },
-            (e) => {
+            e => {
                 console.error('error = ', e);
             }
         );

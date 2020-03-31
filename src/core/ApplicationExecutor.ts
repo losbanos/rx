@@ -30,7 +30,7 @@ export default class ApplicationExecutor {
                 // console.log('result = ', result);
                 this.execApp();
             },
-            (e) => {
+            (e: any) => {
                 console.error(e);
             }
         );

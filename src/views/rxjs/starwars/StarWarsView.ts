@@ -14,6 +14,7 @@ export default class StarWarsView extends Vue {
     private items: Array<any> = [];
 
     protected created() {
+        // tslint:disable-no-empty-block;
     }
 
     protected mounted() {
@@ -21,7 +22,7 @@ export default class StarWarsView extends Vue {
             .then(res => {
                 const results: Array<IStarWarsPeople> = StarWarsMapper.peopleMapper(res.results);
                 this.setPeopleInfo(results);
-            })
+            });
     }
 
     protected setPeopleInfo(people: Array<IStarWarsPeople>) {
@@ -36,7 +37,7 @@ export default class StarWarsView extends Vue {
                     bmi = Math.floor(height / 100 * height / 100 * 22);
                 } else {
                     broca = Math.round(height - 100 * 0.9);
-                    bmi = Math.floor(height / 100  * height /100 * 21);
+                    bmi = Math.floor(height / 100  * height / 100 * 21);
                 }
             }
             const obesityUsingBroca: number = (p.mass - broca);

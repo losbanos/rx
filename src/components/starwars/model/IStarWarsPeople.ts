@@ -1,5 +1,5 @@
 export interface IStarWarsPeople {
-    name: string
+    name: string;
     height: number;
     mass: number;
     hair_color: string;

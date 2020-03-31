@@ -2,7 +2,7 @@ import {IStarWarsPeople} from '@components/starwars/model/IStarWarsPeople';
 
 export class StarWarsMapper {
     public static peopleMapper(results: Array<IStarWarsPeople>) {
-        let people: Array<IStarWarsPeople> = [];
+        const people: Array<IStarWarsPeople> = [];
         for (const user of results) {
             people.push({
                 name: user.name,
