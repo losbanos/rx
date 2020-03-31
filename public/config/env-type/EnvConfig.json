@@ -1,5 +1,7 @@
 {
     "BASE_URL": "https://www",
-    "POKE_API":"",
-    "STARWARS_API": ""
+    "API": {
+        "POKE": "",
+        "STARWARS": "https://swapi.co/api"
+    }
 }

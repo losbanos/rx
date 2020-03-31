@@ -38,6 +38,11 @@ export default new VueRouter({
                     path: 'system',
                     name: 'System',
                     component: () => import('@views/rxjs/SystemView.vue')
+                },
+                {
+                    path: 'starwars',
+                    name: 'StarWars',
+                    component: () => import('@views/rxjs/starwars/StarWarsView.vue')
                 }
             ]
         }
