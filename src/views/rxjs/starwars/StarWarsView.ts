@@ -4,7 +4,7 @@ import ServiceInjectId from '@/const/ServiceInjectId';
 import {StarWarsService} from '@service/StarWarsService';
 import {IStarWarsPeople} from '@components/starwars/model/IStarWarsPeople';
 import {StarWarsMapper} from '@components/starwars/model/StarWarsMapper';
-import {Observable, from} from 'rxjs';
+import {Observable, from, Subscription, Observer} from 'rxjs';
 import {pluck, filter} from 'rxjs/operators';
 
 @Component
@@ -45,6 +45,24 @@ export default class StarWarsView extends Vue {
                 this.items.push(n);
             }
         );
+
+        const num$: Observable<string> = new Observable<string>(observer => {
+            const id = setInterval(() => {
+                observer.next(new Date().toString());
+            }, 1000);
+            return () => {
+                console.log('자원 제거');
+                clearInterval(id);
+            };
+        });
+
+        const numSupscription: Subscription = num$.subscribe(n => console.log(n),
+                e => console.log(e),
+            () => console.log('데이터 전달 완료')
+        );
+        setTimeout(() => {
+            numSupscription.unsubscribe();
+        }, 3000);
     }
 
     protected caculateBmi(user: IStarWarsPeople): IStarWarsPeople {
