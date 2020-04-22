@@ -4,14 +4,18 @@ import ServiceInjectId from '@/const/ServiceInjectId';
 import {StarWarsService} from '@service/StarWarsService';
 import {IStarWarsPeople} from '@components/starwars/model/IStarWarsPeople';
 import {StarWarsMapper} from '@components/starwars/model/StarWarsMapper';
-import {Observable, from, Subscription, Observer} from 'rxjs';
-import {pluck, filter} from 'rxjs/operators';
+import {Observable, from, Subscription, Observer, range, empty, of, throwError, NEVER} from 'rxjs';
+import {pluck, filter, map} from 'rxjs/operators';
+import { ThroneService } from '@/service/ThroneService';
 
 @Component
 export default class StarWarsView extends Vue {
 
     @lazyInject(ServiceInjectId.StarWarsService)
     private starWarsService: StarWarsService;
+
+    @lazyInject(ServiceInjectId.ThroneService)
+    private throneService: ThroneService;
 
     private items: Array<any> = [];
 
@@ -20,13 +24,9 @@ export default class StarWarsView extends Vue {
     }
 
     protected mounted() {
-        this.starWarsService.load('people', 'json')
-            .then(res => {
-                const results: Array<IStarWarsPeople> = StarWarsMapper.peopleMapper(res.results);
-                // this.setPeopleInfo(results);
-                this.setPeopleInfoByRx(results);
-            });
+        // this.callThrone();
     }
+
 
     protected setPeopleInfo(people: Array<IStarWarsPeople>) {
         this.items = people
@@ -55,6 +55,21 @@ export default class StarWarsView extends Vue {
                 clearInterval(id);
             };
         });
+        const i: Observable<number> = of(1, 2, 3, 40, 2, 1);
+        i.pipe(
+            map((n: number) => n < 5 ? n : NEVER)
+        ).subscribe(
+            n => console.log('n = ', n),
+            e => console.error(e),
+            () => console.log('complete')
+        );
+
+        num$.subscribe(n => {
+            console.log('n = ', n);
+        });
+        num$.subscribe(n => {
+            console.log('222 n = ', n);
+        });
 
         const numSupscription: Subscription = num$.subscribe(n => console.log(n),
                 e => console.log(e),
@@ -81,5 +96,13 @@ export default class StarWarsView extends Vue {
         const obesityUsingBmi: number = Math.round((user.mass - bmi) / bmi * 100);
 
         return Object.assign({}, user, {broca, bmi, obesityUsingBroca, obesityUsingBmi});
+    }
+
+    protected callThrone() {
+        this.throneService.load('characters').then(res => {
+            console.log('res = ', res);
+        }).catch(e => {
+            console.log('error = ', e);
+        });
     }
 }

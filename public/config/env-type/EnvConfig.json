@@ -2,6 +2,7 @@
     "BASE_URL": "https://www",
     "API": {
         "POKE": "",
-        "STARWARS": "https://swapi.co/api"
+        "STARWARS": "https://swapi.co/api",
+        "THRONE": "https://www.anapioficeandfire.com/api"
     }
 }

@@ -45,6 +45,11 @@ export default new VueRouter({
                     component: () => import('@views/rxjs/starwars/StarWarsView.vue')
                 }
             ]
+        },
+        {
+            path: '/autocomplete',
+            name: 'AutoComplete',
+            component: () => import('@views/rxjs/autocomplete/AutoComplete.vue')
         }
     ]
 });

@@ -1,8 +1,8 @@
 <template>
     <div id="starwars">
         <h3>StarWars People</h3>
-        <ul v-for="user of items">
-            <li>
+        <ul>
+            <li v-for="user of items" :key="user.name">
                 <dt>{{user.name}}</dt>
                 <dd>키 : {{user.height}}</dd>
                 <dd>몸무게 : {{user.mass}}</dd>
@@ -14,5 +14,4 @@
         </ul>
     </div>
 </template>
-
 <script src="./StarWarsView.ts" lang="ts"></script>
