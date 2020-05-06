@@ -1,7 +1,7 @@
 import {Component, Vue} from 'vue-property-decorator';
 import {fromEvent, Observable, from, of, range, merge, partition} from 'rxjs';
 import {ajax} from 'rxjs/ajax';
-import {map, mergeAll, mergeMap, debounceTime, filter, distinctUntilChanged, tap} from 'rxjs/operators';
+import {map, mergeAll, mergeMap, debounceTime, filter, distinctUntilChanged, tap, switchMap} from 'rxjs/operators';
 import {IResultItem} from './IResultItem';
 
 @Component
@@ -34,7 +34,7 @@ export default class AutoComplete extends Vue {
             tap(() => {
                 this.isLoading = true;
             }),
-            mergeMap((query: string) => {
+            switchMap((query: string) => {
                 return this.getUserRequest(this.GITHUB_URL, query);
             }),
             tap(() => {
