@@ -1,7 +1,7 @@
 import {Component, Vue} from 'vue-property-decorator';
-import {fromEvent, Observable, from, of, range, merge, partition} from 'rxjs';
+import {fromEvent, Observable, from, of, range, merge, partition, interval} from 'rxjs';
 import {ajax} from 'rxjs/ajax';
-import {map, mergeAll, mergeMap, debounceTime, filter, distinctUntilChanged, tap, switchMap} from 'rxjs/operators';
+import {map, mergeAll, mergeMap, debounceTime, filter, distinctUntilChanged, tap, switchMap, take, catchError, retry, finalize} from 'rxjs/operators';
 import {IResultItem} from './IResultItem';
 
 @Component
@@ -15,6 +15,7 @@ export default class AutoComplete extends Vue {
     protected mounted() {
         this.$nextTick(() => {
             this.setInputEventHandler();
+            // this.testSwitchMap();
         });
     }
 
@@ -39,6 +40,10 @@ export default class AutoComplete extends Vue {
             }),
             tap(() => {
                 this.isLoading = false;
+            }),
+            retry(2),
+            finalize(() => {
+                this.isLoading = false;
             })
         ).subscribe((e: any) => {
             this.results = e.items;
@@ -61,5 +66,19 @@ export default class AutoComplete extends Vue {
     private async getData(url: string): Promise<any> {
         return fetch(url)
         .then(res => res.json());
+    }
+
+    private testSwitchMap() {
+        interval(600).pipe(
+            take(5),
+            switchMap(n => {
+                return interval(250).pipe(
+                    map(y => ({n, y})),
+                    take(3)
+                );
+            })
+        ).subscribe(result => {
+            console.log(`next n : ${result.n}, next y: ${result.y}`);
+        });
     }
 }
