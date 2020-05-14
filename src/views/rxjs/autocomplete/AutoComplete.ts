@@ -1,7 +1,7 @@
 import {Component, Vue} from 'vue-property-decorator';
-import {fromEvent, Observable, from, of, range, merge, partition, interval} from 'rxjs';
+import {fromEvent, Observable, from, of, range, merge, partition, interval, timer} from 'rxjs';
 import {ajax} from 'rxjs/ajax';
-import {map, mergeAll, mergeMap, debounceTime, filter, distinctUntilChanged, tap, switchMap, take, catchError, retry, finalize} from 'rxjs/operators';
+import {map, mergeAll, mergeMap, debounceTime, filter, distinctUntilChanged, tap, switchMap, take, catchError, retry, finalize, concatMap, startWith, skip} from 'rxjs/operators';
 import {IResultItem} from './IResultItem';
 
 @Component
@@ -16,6 +16,7 @@ export default class AutoComplete extends Vue {
         this.$nextTick(() => {
             this.setInputEventHandler();
             // this.testSwitchMap();
+            this.testConcatMap();
         });
     }
 
@@ -80,5 +81,41 @@ export default class AutoComplete extends Vue {
         ).subscribe(result => {
             console.log(`next n : ${result.n}, next y: ${result.y}`);
         });
+    }
+
+    private testConcatMap() {
+        const firstValue: number = -1;
+        const requests: Array<Observable<string>> = [
+            timer(2000).pipe(
+                startWith(firstValue),
+                tap(x => x === firstValue && console.log('request-1 is 구독되었음')),
+                skip(1),
+                map(v => 'request 1')
+            ),
+            timer(1000).pipe(
+                startWith(firstValue),
+                tap(x => x === firstValue && console.log('request-2 is 구독되었음')),
+                skip(1),
+                map(v => 'request 2')
+            ),
+            timer(1500).pipe(
+                startWith(firstValue),
+                tap(x => x === firstValue && console.log('request-3 is 구독되었음')),
+                skip(1),
+                map(v => 'request 3')
+            )
+        ];
+
+        interval(1000).pipe(
+            take(5)
+        ).subscribe(x => console.log(`${x + 1} secs`));
+
+        range(0, 3).pipe(
+            tap(x => console.log(`range next ${x}`)),
+            concatMap(x => {
+                return console.log(`concatMap project function ${x}`) || requests[x];
+            }
+        )).subscribe(req => console.log(`response from ${req}`));
+
     }
 }
