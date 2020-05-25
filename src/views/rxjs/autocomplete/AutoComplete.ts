@@ -1,8 +1,9 @@
 import {Component, Vue} from 'vue-property-decorator';
-import {fromEvent, Observable, from, of, range, merge, partition, interval, timer} from 'rxjs';
+import {fromEvent, Observable, from, of, range, merge, partition, interval, timer, Observer, Subject} from 'rxjs';
 import {ajax} from 'rxjs/ajax';
-import {map, mergeAll, mergeMap, debounceTime, filter, distinctUntilChanged, tap, switchMap, take, catchError, retry, finalize, concatMap, startWith, skip} from 'rxjs/operators';
+import {map, mergeAll, mergeMap, debounceTime, filter, distinctUntilChanged, tap, switchMap, take, pluck, catchError, retry, finalize, concatMap, startWith, skip, scan} from 'rxjs/operators';
 import {IResultItem} from './IResultItem';
+import { ajaxGet } from 'rxjs/internal/observable/dom/AjaxObservable';
 
 @Component
 export default class AutoComplete extends Vue {
@@ -14,9 +15,11 @@ export default class AutoComplete extends Vue {
 
     protected mounted() {
         this.$nextTick(() => {
-            this.setInputEventHandler();
+            // this.setInputEventHandler();
             // this.testSwitchMap();
-            this.testConcatMap();
+            // this.testConcatMap();
+            // this.coldObservable();
+            this.hotObservable();
         });
     }
 
@@ -45,7 +48,8 @@ export default class AutoComplete extends Vue {
             retry(2),
             finalize(() => {
                 this.isLoading = false;
-            })
+            }),
+            tap(v => console.log('from user$ = ', v))
         ).subscribe((e: any) => {
             this.results = e.items;
             this.totalCount = e.total_count;
@@ -55,7 +59,8 @@ export default class AutoComplete extends Vue {
             tap(() => {
                 this.results = [];
                 this.totalCount = 0;
-            })
+            }),
+            tap(v => console.log('from reset = ', v))
         ).subscribe();
     }
 
@@ -116,6 +121,69 @@ export default class AutoComplete extends Vue {
                 return console.log(`concatMap project function ${x}`) || requests[x];
             }
         )).subscribe(req => console.log(`response from ${req}`));
+
+    }
+
+    private hotObservable() {
+        const subj: Subject<any> = new Subject<any>();
+
+        const keyup$: Observable<string> = fromEvent(this.$refs.search_inp as HTMLInputElement, 'keyup')
+        .pipe(
+            debounceTime(1000),
+            map((e: Event) => {
+                return (e.target as HTMLInputElement).value;
+            }),
+            distinctUntilChanged()
+        );
+
+        // const [user$, reset$] = partition(keyup$, (v: string) => v.trim().length > 0);
+        const [user$, reset$] = partition(subj, (v: string) => v.trim().length > 0);
+        user$.pipe(
+            tap(v => this.isLoading = true),
+            switchMap(query => {
+                return this.getUserRequest(this.GITHUB_URL, query);
+            }),
+            tap(v => this.isLoading = false),
+            retry(2),
+            finalize(() => {
+                this.isLoading = false;
+            })
+        ).subscribe((e: any) => {
+            this.results = e.items;
+            this.totalCount = e.total_count;
+        });
+
+        reset$.pipe(
+            tap(v => {
+                this.isLoading = false;
+                this.results = [];
+                this.totalCount = 0;
+            })).subscribe();
+            
+        keyup$.subscribe(subj);
+    }
+
+    private coldObservable() {
+        const n: number = 7;
+        const source$: Observable<number> = interval(500).pipe(
+            take(n),
+            scan((acc, v) => {
+                let localValue: any = acc;
+                if (typeof localValue === 'function') {
+                    localValue = localValue();
+                }
+                const tempA = localValue.a;
+                localValue.a = localValue.b;
+                localValue.b = tempA + localValue.b;
+                return localValue;
+            }, () => ({a: 1, b: 0})),
+            pluck('a')
+        );
+
+        source$.subscribe(result => console.log(`result = ${result}`));
+        setTimeout(() => {
+            source$.subscribe(result2 => console.log(`result2 = > ${result2}`));
+        }, 3100);
 
     }
 }
