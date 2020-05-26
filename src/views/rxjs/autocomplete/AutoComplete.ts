@@ -1,9 +1,10 @@
 import {Component, Vue} from 'vue-property-decorator';
-import {fromEvent, Observable, from, of, range, merge, partition, interval, timer, Observer, Subject} from 'rxjs';
+import {fromEvent, Observable, from, of, range, merge, partition, interval, timer, Observer, Subject, Subscription} from 'rxjs';
 import {ajax} from 'rxjs/ajax';
-import {map, mergeAll, mergeMap, debounceTime, filter, distinctUntilChanged, tap, switchMap, take, pluck, catchError, retry, finalize, concatMap, startWith, skip, scan} from 'rxjs/operators';
+import {map, mergeAll, mergeMap, debounceTime, filter,
+    distinctUntilChanged, tap, switchMap, take, pluck,
+    catchError, retry, finalize, concatMap, startWith, skip, scan, multicast, publish, refCount, share} from 'rxjs/operators';
 import {IResultItem} from './IResultItem';
-import { ajaxGet } from 'rxjs/internal/observable/dom/AjaxObservable';
 
 @Component
 export default class AutoComplete extends Vue {
@@ -15,14 +16,38 @@ export default class AutoComplete extends Vue {
 
     protected mounted() {
         this.$nextTick(() => {
-            // this.setInputEventHandler();
+            this.setInputEventHandler();
             // this.testSwitchMap();
             // this.testConcatMap();
             // this.coldObservable();
-            this.hotObservable();
+            // this.hotObservable();
+            // this.publishable();
         });
     }
 
+    private publishable() {
+        const number$: Observable<number> = interval(1000);
+        const connectable$: Observable<number> = number$.pipe(share());
+        let subscription2: Subscription;
+        
+        const subscription1: Subscription = connectable$.subscribe(v => console.log(`observerA: ${v}`));
+        // let connectSubj: Subject<any> = connectable$.connect();
+
+        setTimeout(() => {
+            subscription2 = connectable$.subscribe(v => console.log(`observerB: ${v}`));
+        }, 1000);
+
+        setTimeout(() => {
+            console.log('observerA is unsubscribed');
+            subscription1.unsubscribe();
+        }, 2000);
+        setTimeout(() => {
+            console.log('observerB is unsubscribed');
+            subscription2.unsubscribe();
+            console.log('connectableObservable is unsubscribed');
+            // connectSubj.unsubscribe();
+        }, 3100);
+    }
     private setInputEventHandler() {
 
         const keyup$: Observable<string> = fromEvent(this.$refs.search_inp as HTMLInputElement, 'keyup')
@@ -31,7 +56,9 @@ export default class AutoComplete extends Vue {
             map((e: Event) => {
                 return (e.target as HTMLInputElement).value;
             }),
-            distinctUntilChanged());
+            distinctUntilChanged(),
+            share()
+        );
 
         const [user$, reset$]: any = partition(keyup$, query => query.trim().length > 0);
 
@@ -133,11 +160,12 @@ export default class AutoComplete extends Vue {
             map((e: Event) => {
                 return (e.target as HTMLInputElement).value;
             }),
-            distinctUntilChanged()
+            distinctUntilChanged(),
+            tap(v => console.log('from keyup$ = ', v)),
+            publish()
         );
-
         // const [user$, reset$] = partition(keyup$, (v: string) => v.trim().length > 0);
-        const [user$, reset$] = partition(subj, (v: string) => v.trim().length > 0);
+        const [user$, reset$] = partition(keyup$, (v: string) => v.trim().length > 0);
         user$.pipe(
             tap(v => this.isLoading = true),
             switchMap(query => {
@@ -159,8 +187,7 @@ export default class AutoComplete extends Vue {
                 this.results = [];
                 this.totalCount = 0;
             })).subscribe();
-            
-        keyup$.subscribe(subj);
+        keyup$.connect();
     }
 
     private coldObservable() {
