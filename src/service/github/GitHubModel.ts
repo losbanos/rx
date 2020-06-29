@@ -5,8 +5,8 @@ export class GitHubModel {
         public incompleteResults: boolean,
         public items: Array<GitHubItemModel>,
         public totalCount: number
-    ){
-
+    ) {
+        // tslint:disable:empty-block;
     }
 
     public static create(res: GitHubModel): GitHubModel {

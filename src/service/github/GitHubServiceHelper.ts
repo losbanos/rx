@@ -9,7 +9,7 @@ export class GitHubServiceHelper {
             incompleteResults: response.incomplete_results,
             items: GitHubServiceHelper.mappingGitHubItemResponse(response.items),
             totalCount: response.total_count
-        })
+        });
     }
 
     public static mappingGitHubItemResponse(items: Array<GitHubItemResponse>): Array<GitHubItemModel> {
