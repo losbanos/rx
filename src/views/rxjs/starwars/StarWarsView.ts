@@ -1,6 +1,6 @@
 import {Component, Vue} from 'vue-property-decorator';
 import {lazyInject} from '@core/ServiceManager';
-import ServiceInjectId from '@/const/ServiceInjectId';
+import DependencyInjectId from '@/const/DependencyInjectId';
 import {StarWarsService} from '@service/StarWarsService';
 import {IStarWarsPeople} from '@components/starwars/model/IStarWarsPeople';
 import {StarWarsMapper} from '@components/starwars/model/StarWarsMapper';
@@ -11,10 +11,10 @@ import { ThroneService } from '@/service/ThroneService';
 @Component
 export default class StarWarsView extends Vue {
 
-    @lazyInject(ServiceInjectId.StarWarsService)
+    @lazyInject(DependencyInjectId.StarWarsService)
     private starWarsService: StarWarsService;
 
-    @lazyInject(ServiceInjectId.ThroneService)
+    @lazyInject(DependencyInjectId.ThroneService)
     private throneService: ThroneService;
 
     private items: Array<any> = [];

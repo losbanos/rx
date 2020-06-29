@@ -1,12 +1,13 @@
 import {ApplicationConfig} from '@core/ApplicationConfig';
 import {inject, injectable} from 'inversify';
-import ServiceInjectId from '@/const/ServiceInjectId';
+import DependencyInjectId from '@/const/DependencyInjectId';
+import {lazyInject} from '@core/ServiceManager';
 
 @injectable()
 export class PokeService {
 
     public constructor(
-        @inject(ServiceInjectId.Configuration) protected configuration: ApplicationConfig
+        @lazyInject(DependencyInjectId.Configuration) protected configuration: ApplicationConfig
     ) {
         /* tslint-disable:no-empty-block */
     }

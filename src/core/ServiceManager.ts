@@ -2,7 +2,7 @@ import {Container, interfaces} from 'inversify';
 import getDecoratiors from 'inversify-inject-decorators';
 import {IInjectService} from '@/core/interface/IInjectService';
 import {InjectScopeType} from '@/enum/InjectScopeType';
-import ServiceInjectId from '@/const/ServiceInjectId';
+import DependencyInjectId from '@/const/DependencyInjectId';
 import {IApplicationConfig} from '@/core/interface/IApplicationConfig';
 
 class ServiceManager {
@@ -21,7 +21,7 @@ class ServiceManager {
 
     public bindConfig(config: IApplicationConfig) {
         this.config = config;
-        this.container.bind<IApplicationConfig>(ServiceInjectId.Configuration).toConstantValue(this.config);
+        this.container.bind<IApplicationConfig>(DependencyInjectId.Configuration).toConstantValue(this.config);
     }
 
     public bindService(services: Array<IInjectService>) {

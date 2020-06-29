@@ -2,12 +2,12 @@ import { ThroneMapper } from '@/components/throne/ThroneMapper';
 import {injectable} from 'inversify';
 import {lazyInject} from '@core/ServiceManager';
 import {ApplicationConfig} from '@core/ApplicationConfig';
-import ServiceInjectId from '@/const/ServiceInjectId';
+import DependencyInjectId from '@/const/DependencyInjectId';
 
 @injectable()
 export class ThroneService {
 
-    @lazyInject(ServiceInjectId.Configuration)
+    @lazyInject(DependencyInjectId.Configuration)
     private configuration: ApplicationConfig;
 
     public load(endpoint: string): Promise<any> {

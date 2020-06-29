@@ -1,12 +1,12 @@
 import {injectable} from 'inversify';
 import {lazyInject} from '@core/ServiceManager';
-import ServiceInjectId from '@/const/ServiceInjectId';
+import DependencyInjectId from '@/const/DependencyInjectId';
 import {ApplicationConfig} from '@core/ApplicationConfig';
 
 @injectable()
 export class StarWarsService {
 
-    @lazyInject(ServiceInjectId.Configuration)
+    @lazyInject(DependencyInjectId.Configuration)
     protected configuration: ApplicationConfig;
 
     public load(itemName: string, format: string) {

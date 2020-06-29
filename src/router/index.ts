@@ -50,6 +50,11 @@ export default new VueRouter({
             path: '/autocomplete',
             name: 'AutoComplete',
             component: () => import('@views/rxjs/autocomplete/AutoComplete.vue')
+        },
+        {
+            path: '/carousel',
+            name: 'Carousel',
+            component: () => import('@views/carousel/Carousel.vue')
         }
     ]
 });

@@ -18,7 +18,7 @@ export default class AutoComplete extends Vue {
         this.$nextTick(() => {
             this.setInputEventHandler();
             // this.testSwitchMap();
-            // this.testConcatMap();
+            this.testConcatMap();
             // this.coldObservable();
             // this.hotObservable();
             // this.publishable();
@@ -29,7 +29,6 @@ export default class AutoComplete extends Vue {
         const number$: Observable<number> = interval(1000);
         const connectable$: Observable<number> = number$.pipe(share());
         let subscription2: Subscription;
-        
         const subscription1: Subscription = connectable$.subscribe(v => console.log(`observerA: ${v}`));
         // let connectSubj: Subject<any> = connectable$.connect();
 
@@ -145,13 +144,35 @@ export default class AutoComplete extends Vue {
         range(0, 3).pipe(
             tap(x => console.log(`range next ${x}`)),
             concatMap(x => {
-                return console.log(`concatMap project function ${x}`) || requests[x];
+                console.log(`concatMap project function ${x}`);
+                return requests[x];
             }
-        )).subscribe(req => console.log(`response from ${req}`));
+        ));
 
+        of(1).pipe(
+            tap(x => console.log('start')),
+            mergeMap(x => {
+                return timer(2000).pipe(
+                    tap(t => console.log('2000 구독')),
+                    map(v => {
+                        console.log('timer 2000 observable');
+                        return '2000 observalbe';
+                    }));
+            }),
+            mergeMap(r => {
+                return timer(1000).pipe(
+                    tap(t => console.log('1000 구독')),
+                    map(x => {
+                        console.log('timer 1000 observable');
+                        return `${r} 1000 observable`;
+                    }));
+                })
+        ).subscribe(
+            n => console.log('result = ', n)
+        );
     }
 
-    private hotObservable() {
+    private hotObservable(): void {
         const subj: Subject<any> = new Subject<any>();
 
         const keyup$: Observable<string> = fromEvent(this.$refs.search_inp as HTMLInputElement, 'keyup')
@@ -187,7 +208,7 @@ export default class AutoComplete extends Vue {
                 this.results = [];
                 this.totalCount = 0;
             })).subscribe();
-        keyup$.connect();
+        // keyup$.connect();
     }
 
     private coldObservable() {
