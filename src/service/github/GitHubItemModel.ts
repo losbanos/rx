@@ -19,7 +19,7 @@ export class GitHubItemModel {
         public subscriptionsUrl: string,
         public type: string,
         public url: string
-    ){
+    ) {
     }
 
     public static create(response: GitHubItemModel): GitHubItemModel {
