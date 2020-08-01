@@ -1,6 +1,6 @@
 import {Component, Vue} from 'vue-property-decorator';
-import {fromEvent, Observable, Observer, Subscriber, OperatorFunction, interval, Subscription, SubscriptionLike, TeardownLogic, of} from 'rxjs';
-import {map, takeUntil, mergeMap, switchMap} from 'rxjs/operators';
+import {fromEvent, Observable, Observer, Subscriber, OperatorFunction, interval, Subscription, SubscriptionLike, TeardownLogic, of, range, merge, from} from 'rxjs';
+import {map, takeUntil, mergeMap, switchMap, take, first, startWith, filter, withLatestFrom, tap, share} from 'rxjs/operators';
 import {lazyInject} from '@core/ServiceManager';
 import DependencyInjectId from '@/const/DependencyInjectId';
 import {ThroneService} from '@service/ThroneService';
@@ -9,6 +9,7 @@ import { GitHubService } from '@/service/github/GitHubService';
 import { GitHubModel } from '@/service/github/GitHubModel';
 import { GitHubItemModel } from '@/service/github/GitHubItemModel';
 import { USER_EVENT, SUPPORT_TOUCH, UserEventType } from '@/const/UserEvent';
+import { Action } from 'rxjs/internal/scheduler/Action';
 
 @Component
 export default class Carousel extends BaseComponent {
@@ -33,7 +34,7 @@ export default class Carousel extends BaseComponent {
     protected mounted() {
         this.gitHubService.profile('typescript');
 
-        const view: HTMLElement = this.$refs.carousel as HTMLElement;
+        const carousel: HTMLElement = this.$refs.carousel as HTMLElement;
         const container: HTMLElement = this.$refs.container as HTMLElement;
 
         type ActionEventType = UserEventType<TouchEvent | MouseEvent>;
@@ -41,78 +42,48 @@ export default class Carousel extends BaseComponent {
             return event instanceof TouchEvent ? event.changedTouches[0].pageX : event.pageX;
         };
 
-        const toProps2: (ob$: Observable<ActionEventType>) => Observable<number> = (param$: Observable<ActionEventType>) => {
-            return param$.pipe(
+        const toProps2: (ov: Observable<ActionEventType>) => Observable<number> = (source$: Observable<ActionEventType>) => {
+            return source$.pipe(
                 map((event: ActionEventType) => {
                     return event instanceof TouchEvent ? event.changedTouches[0].pageX : event.pageX;
                 })
             );
         };
 
-        const toProps3: <T>(source: Observable<T>) => any = <T>(source: Observable<T>) => {
-            
-            return new Observable((subscriber: Subscriber<any>) => {
-                subscriber.next('abc');
-                subscriber.complete();
-            });
-        }
-
-        const filterNil: <T, R>(project: (value: T) => R) => OperatorFunction<T, R> = <T, R>(project: (value: T) => R): OperatorFunction<T, R> => {
-            return <U>(source: Observable<any>): Observable<U> => {
-                const transformFn: any = project;
-                return new Observable((subscriber: Subscriber<U>): TeardownLogic => {
-                    const subscription: Subscription = source.subscribe(
-                        n => {
-                            if (n % 2 === 0) {
-                                subscriber.next(transformFn(n));
-                            }
-                        },
-                        e => {
-                            subscriber.error(e);
-                        },
-                        () => {
-                            console.log('complete');
-                            subscriber.complete();
-                        }
-                    );
-                    return () => subscription.unsubscribe();
-                });
-            };
-        };
-
-        const a: Subscription = interval(1000).pipe(
-            map(v => {
-                return v === 0 ? undefined : v;
-            }),
-            filterNil(v => {
-                return v + 1;
+        const start$: Observable<any> = fromEvent<ActionEventType>(carousel, USER_EVENT.START).pipe(toProps2);
+        const move$: Observable<any> = fromEvent<ActionEventType>(carousel, USER_EVENT.MOVE).pipe(toProps2);
+        const end$: Observable<any> = fromEvent<ActionEventType>(carousel, USER_EVENT.END);
+        const size$: Observable<number> = fromEvent(window, 'resize').pipe(
+            startWith(0),
+            map((e: Event) => {
+                console.log('e = ', e);
+                return carousel.clientWidth;
             })
-        ).subscribe(
-            n => {
-                console.log('n = ', n);
-                if (n > 10) {
-                    a.unsubscribe();
-                }
-            },
-            e => console.log(e),
-            () => console.log('complete')
         );
-
-        const start$: Observable<any> = fromEvent<ActionEventType>(view, USER_EVENT.START).pipe(
-            toProps2
-        );
-        const move$: Observable<any> = fromEvent<ActionEventType>(view, USER_EVENT.MOVE).pipe(
-            toProps2
-        );
-
-        const end$: Observable<any> = fromEvent(view, USER_EVENT.END);
-
-        const drag$: Observable<any> = start$.pipe( 
+        const drag$: Observable<number> = start$.pipe(
             switchMap(start => {
                 return move$.pipe(
-                    takeUntil(end$)
+                    map(move => move - start),
+                    takeUntil(end$),
                 );
-            })
+            }),
+            share(),
         );
+
+        const drop$: Observable<any> = drag$.pipe(
+            switchMap(drag => {
+                return end$.pipe(
+                    map(event => drag),
+                    first()
+                );
+            }),
+            withLatestFrom(size$)
+        );
+
+        const carousel$: Observable<any> = merge(drag$, drop$);
+
+        carousel$.subscribe(
+            n => console.log('carousel = ', n)
+        )
     }
 }

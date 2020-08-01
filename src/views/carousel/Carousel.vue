@@ -15,9 +15,11 @@
     padding: 0;
     list-style: none;
     font-size: 0;
+    background: #eee;
 }
 .view .panel {
     width: 100%;
+    min-height: 200px;
     max-height: 200px;
     display: inline-block;
 }
