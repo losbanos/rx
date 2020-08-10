@@ -1,6 +1,6 @@
 import {Component, Vue} from 'vue-property-decorator';
 import {fromEvent, Observable, Observer, Subscriber, OperatorFunction, interval, Subscription, SubscriptionLike, TeardownLogic, of, range, merge, from} from 'rxjs';
-import {map, takeUntil, mergeMap, switchMap, take, first, startWith, filter, withLatestFrom, tap, share} from 'rxjs/operators';
+import {map, takeUntil, mergeMap, switchMap, take, first, startWith, filter, withLatestFrom, tap, share, scan, pluck} from 'rxjs/operators';
 import {lazyInject} from '@core/ServiceManager';
 import DependencyInjectId from '@/const/DependencyInjectId';
 import {ThroneService} from '@service/ThroneService';
@@ -9,8 +9,13 @@ import { GitHubService } from '@/service/github/GitHubService';
 import { GitHubModel } from '@/service/github/GitHubModel';
 import { GitHubItemModel } from '@/service/github/GitHubItemModel';
 import { USER_EVENT, SUPPORT_TOUCH, UserEventType } from '@/const/UserEvent';
-import { Action } from 'rxjs/internal/scheduler/Action';
 
+interface UpdateStore {
+    from?: number;
+    to?: number;
+    index?: number;
+    size?: number;
+}
 @Component
 export default class Carousel extends BaseComponent {
 
@@ -56,18 +61,18 @@ export default class Carousel extends BaseComponent {
         const size$: Observable<number> = fromEvent(window, 'resize').pipe(
             startWith(0),
             map((e: Event) => {
-                console.log('e = ', e);
                 return carousel.clientWidth;
             })
         );
-        const drag$: Observable<number> = start$.pipe(
+        const drag$: Observable<any> = start$.pipe(
             switchMap(start => {
                 return move$.pipe(
                     map(move => move - start),
-                    takeUntil(end$),
+                    takeUntil(end$)
                 );
             }),
-            share(),
+            map(distance => ({distance})),
+            share()
         );
 
         const drop$: Observable<any> = drag$.pipe(
@@ -77,13 +82,29 @@ export default class Carousel extends BaseComponent {
                     first()
                 );
             }),
-            withLatestFrom(size$)
+            withLatestFrom(size$, (drag, size) => {
+                return {...drag, size};
+            })
         );
+        
+        const carousel$: Observable<any> = merge(drag$, drop$).pipe(
+            scan((store, {distance, size}) => {
+                const updateStore: UpdateStore = {
+                    from: ((store.index * store.size) * -1 ) + distance
+                };
 
-        const carousel$: Observable<any> = merge(drag$, drop$);
-
-        carousel$.subscribe(
-            n => console.log('carousel = ', n)
-        )
+                if (size === void 0) {
+                    updateStore.to = updateStore.from;
+                } else {
+                    // updateStore.size > updateStore.from ? 1: 0;
+                }
+                return {...store, ...updateStore};
+            }, {
+                from: 0,
+                to: 0,
+                index: 0,
+                size: 0
+            })
+        ).subscribe(n => console.log(n));
     }
 }
