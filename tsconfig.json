@@ -16,10 +16,6 @@
       "node_modules/@types",
       "src"
     ],
-    "types": [
-      "webpack-env",
-      "types"
-    ],
     "paths": {
       "@/*": [
         "src/*"

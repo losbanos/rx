@@ -9,6 +9,7 @@ import { GitHubService } from '@/service/github/GitHubService';
 import { GitHubModel } from '@/service/github/GitHubModel';
 import { GitHubItemModel } from '@/service/github/GitHubItemModel';
 import { USER_EVENT, SUPPORT_TOUCH, UserEventType } from '@/const/UserEvent';
+import {CarouselLimit} from '@/enum/CarouselLimit';
 
 interface UpdateStore {
     from?: number;
@@ -58,7 +59,7 @@ export default class Carousel extends BaseComponent {
         const start$: Observable<any> = fromEvent<ActionEventType>(carousel, USER_EVENT.START).pipe(toProps2);
         const move$: Observable<any> = fromEvent<ActionEventType>(carousel, USER_EVENT.MOVE).pipe(toProps2);
         const end$: Observable<any> = fromEvent<ActionEventType>(carousel, USER_EVENT.END);
-        const size$: Observable<number> = fromEvent(window, 'resize').pipe(
+        const size$: Observable<any> = fromEvent<any>(window, 'resize').pipe(
             startWith(0),
             map((e: Event) => {
                 return carousel.clientWidth;
@@ -86,7 +87,7 @@ export default class Carousel extends BaseComponent {
                 return {...drag, size};
             })
         );
-        
+
         const carousel$: Observable<any> = merge(drag$, drop$).pipe(
             scan((store, {distance, size}) => {
                 const updateStore: UpdateStore = {
@@ -96,7 +97,13 @@ export default class Carousel extends BaseComponent {
                 if (size === void 0) {
                     updateStore.to = updateStore.from;
                 } else {
-                    // updateStore.size > updateStore.from ? 1: 0;
+                    let nextIndex: number = store.index;
+                    if (Math.abs(distance) >= CarouselLimit.Threshold) {
+                        nextIndex = distance > 0 ? Math.max(nextIndex - 1, 0) : Math.min(nextIndex + 1, 4 - 1);
+                    }
+                    updateStore.index = nextIndex;
+                    updateStore.to = Number((nextIndex * size) * -1);
+                    updateStore.size = size;
                 }
                 return {...store, ...updateStore};
             }, {
