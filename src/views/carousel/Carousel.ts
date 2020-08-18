@@ -90,28 +90,27 @@ export default class Carousel extends BaseComponent {
 
         const carousel$: Observable<any> = merge(drag$, drop$).pipe(
             scan((store, {distance, size}) => {
-                const updateStore: UpdateStore = {
-                    from: ((store.index * store.size) * -1 ) + distance
-                };
-
+                let updateStore: UpdateStore = {from: (store.index * store.size * -1) + distance};
                 if (size === void 0) {
                     updateStore.to = updateStore.from;
                 } else {
-                    let nextIndex: number = store.index;
+                    let tobeIndex: number = store.index;
                     if (Math.abs(distance) >= CarouselLimit.Threshold) {
-                        nextIndex = distance > 0 ? Math.max(nextIndex - 1, 0) : Math.min(nextIndex + 1, 4 - 1);
+                        tobeIndex = distance < 0 ? Math.min(tobeIndex + 1, this.itemLength - 1) : Math.max(tobeIndex - 1, 0);
                     }
-                    updateStore.index = nextIndex;
-                    updateStore.to = Number((nextIndex * size) * -1);
+                    updateStore.index = tobeIndex;
                     updateStore.size = size;
+                    updateStore.to = - (size * tobeIndex);
                 }
                 return {...store, ...updateStore};
             }, {
+                index: 0,
                 from: 0,
                 to: 0,
-                index: 0,
                 size: 0
             })
-        ).subscribe(n => console.log(n));
+        ).subscribe(n => {
+            container.style.transform = `translate3d(${n.to}px, 0, 0)`;
+        });
     }
 }

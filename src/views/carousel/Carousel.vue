@@ -1,7 +1,7 @@
 <template>
     <div id="carousel" class="view" ref="carousel">
         <ul id="container" class="container" ref="container">
-            <li v-for="item in items" :key="item.id" class="panel">{{item.text}}</li>
+            <li v-for="item in items" :key="item.id" class="panel" :style="`background-color:#${Math.random().toString(16).substr(-6)};`">{{item.text}}</li>
         </ul>
     </div>
 </template>
