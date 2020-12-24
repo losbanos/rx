@@ -6,4 +6,4 @@ export const USER_EVENT = {
     END: SUPPORT_TOUCH ? 'touchend' : 'mouseup'
 };
 
-export type UserEventType<T> = T extends TouchEvent ? TouchEvent : T extends MouseEvent ? MouseEvent : Event;
+export type UserEventType<T> = T extends TouchEvent ? TouchEvent : T extends MouseEvent ? MouseEvent : UIEvent;

@@ -1,12 +1,11 @@
 <template>
-    <div id="carousel" class="view" ref="carousel">
-        <ul id="container" class="container" ref="container">
+    <div id="slideWrapper" class="view" ref="view">
+        <ul id="slide" ref="container" class="container">
             <li v-for="item in items" :key="item.id" class="panel" :style="`background-color:#${Math.random().toString(16).substr(-6)};`">{{item.text}}</li>
         </ul>
-        <button ref="btn">Click</button>
     </div>
 </template>
-<script lang="ts" src="./Carousel.ts"></script>
+<script lang="ts" src="./Slide.ts"></script>
 <style>
 .view{
     overflow: hidden;
@@ -24,4 +23,3 @@
     max-height: 200px;
     display: inline-block;
 }
-</style>

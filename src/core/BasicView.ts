@@ -2,7 +2,7 @@ import {Component, Vue} from 'vue-property-decorator';
 import {Observable, Subscription} from 'rxjs';
 
 @Component
-export default class Basecomponent extends Vue {
+export default class BasicView extends Vue {
     private subscription: Subscription = new Subscription();
 
     protected subscribe<T>(observable: Observable<T>, next?: (value: T) => void, error?: (error: any) => void, complete?: () => void ): Subscription {

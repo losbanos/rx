@@ -1,3 +1,3 @@
 export const enum CarouselLimit {
-    Threshold = 60
+    Threshold = 120
 }

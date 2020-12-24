@@ -1,15 +1,16 @@
 import {Component, Vue} from 'vue-property-decorator';
-import {fromEvent, Observable, Observer, Subscriber, OperatorFunction, interval, Subscription, SubscriptionLike, TeardownLogic, of, range, merge, from} from 'rxjs';
-import {map, takeUntil, mergeMap, switchMap, take, first, startWith, filter, withLatestFrom, tap, share, scan, pluck} from 'rxjs/operators';
+import {fromEvent, Observable, Observer, Subscriber, OperatorFunction, interval, Subscription, SubscriptionLike, TeardownLogic, of, range, merge, from, asyncScheduler, asapScheduler, queueScheduler} from 'rxjs';
+import {map, takeUntil, mergeMap, switchMap, take, first, startWith, filter, withLatestFrom, tap, share, scan, pluck, subscribeOn, observeOn, animationFrameScheduler} from 'rxjs/operators';
 import {lazyInject} from '@core/ServiceManager';
 import DependencyInjectId from '@/const/DependencyInjectId';
 import {ThroneService} from '@service/ThroneService';
-import BaseComponent from '@core/BaseComponent';
+import BasicView from '@/core/BasicView';
 import { GitHubService } from '@/service/github/GitHubService';
 import { GitHubModel } from '@/service/github/GitHubModel';
 import { GitHubItemModel } from '@/service/github/GitHubItemModel';
 import { USER_EVENT, SUPPORT_TOUCH, UserEventType } from '@/const/UserEvent';
 import {CarouselLimit} from '@/enum/CarouselLimit';
+import { async } from 'rxjs/internal/scheduler/async';
 
 interface UpdateStore {
     from?: number;
@@ -18,7 +19,7 @@ interface UpdateStore {
     size?: number;
 }
 @Component
-export default class Carousel extends BaseComponent {
+export default class Carousel extends BasicView {
 
     @lazyInject(DependencyInjectId.ThroneService)
     protected throneService: ThroneService;
@@ -80,6 +81,7 @@ export default class Carousel extends BaseComponent {
             switchMap(drag => {
                 return end$.pipe(
                     map(event => drag),
+                    C
                     first()
                 );
             }),
@@ -112,5 +114,71 @@ export default class Carousel extends BaseComponent {
         ).subscribe(n => {
             container.style.transform = `translate3d(${n.to}px, 0, 0)`;
         });
+
+        const ob$: Observable<string> = of('A', 'B', 'C')
+        .pipe(
+            // subscribeOn(asyncScheduler),
+            tap(n => console.log(n, ' = 데이터 처리 1')),
+            tap(n => console.log(n, ' = 데이터 처리 2')),
+            observeOn(asyncScheduler, 1000),
+            tap(n => console.log(n, ' = 데이터 처리 3')),
+            tap(n => console.log(n, ' = 데이터 처리 4')),
+            subscribeOn(asyncScheduler, 1000)
+        );
+
+
+        // const source$: Observable<number> = new Observable<number>((subscriber) => {
+        //     console.log('Begin source');
+        //     subscriber.next(1);
+        //     subscriber.next(2);
+        //     subscriber.next(3);
+        //     console.log('End source');
+        // })
+
+        // console.log('before subscribe');
+        // source$.pipe(
+        //     observeOn(asyncScheduler, 1000),
+        //     map(n => {
+        //         return n * 2;
+        //     })
+        // ).subscribe(
+        //     n => console.log('n = ', n)
+        // );
+        // console.log('after subscribe');
+
+        const body: HTMLElement = document.getElementsByTagName('body')[0];
+        const observer1: MutationObserver = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                console.log('mutations = ', mutation);
+                mutation.addedNodes.forEach((node, key, vv) => {
+                    console.log(node.nodeType);
+                });
+            });
+        });
+        console.log(observer1);
+        observer1.observe(body, {childList: true});
+
+        // setTimeout(() => {
+        //     const el: HTMLElement = document.createElement('p');
+        //     el.innerText = 'THIS iS ADDED P TAG';
+        //     body.appendChild(el);
+        //     console.log('------------APPENDED----------------------------', el);
+        //     // observer1.disconnect();
+        // }, 1000);
+
+        interval(1000).pipe(
+            take(5),
+            tap(() => {
+                const el: HTMLElement = document.createElement('p');
+                el.innerText = 'THIS iS ADDED P TAG';
+                body.appendChild(el);
+                console.log('------------APPENDED----------------------------', el);
+            })
+        ).subscribe(
+            () => {},
+            () => {},
+            () => observer1.disconnect()
+        );
     }
+
 }

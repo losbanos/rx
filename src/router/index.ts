@@ -55,6 +55,16 @@ export default new VueRouter({
             path: '/carousel',
             name: 'Carousel',
             component: () => import('@views/carousel/Carousel.vue')
+        },
+        {
+            path: '/casting',
+            name: 'Casting',
+            component: () => import('@views/casting/Casting.vue')
+        },
+        {
+            path: '/slide',
+            name: 'SlideCarousel',
+            component: () => import('@views/slide/Slide.vue')
         }
     ]
 });
