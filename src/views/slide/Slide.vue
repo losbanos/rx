@@ -23,3 +23,4 @@
     max-height: 200px;
     display: inline-block;
 }
+</style>

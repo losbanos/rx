@@ -6,8 +6,8 @@ import DependencyInjectId from '@/const/DependencyInjectId';
 import { GitHubService } from '@/service/github/GitHubService';
 import { GitHubModel } from '@/service/github/GitHubModel';
 import {GitHubItemModel} from '@service/github/GitHubItemModel'
-import {Subject, Observer, interval, Observable, BehaviorSubject, ReplaySubject, AsyncSubject, Subscription, ConnectableObservable} from 'rxjs';
-import { map, multicast, pluck, publish, refCount, scan, share, take, tap } from 'rxjs/operators';
+import {Subject, Observer, interval, Observable, BehaviorSubject, ReplaySubject, AsyncSubject, Subscription, ConnectableObservable, range} from 'rxjs';
+import { concatMap, map, mergeMap, multicast, pluck, publish, reduce, refCount, scan, share, startWith, take, tap } from 'rxjs/operators';
 
 interface HotObservableType {
     connect: () => Subscription;
@@ -26,12 +26,12 @@ export default class Casting extends BasicView {
     private subject: Subject<number> = new Subject<number>();
 
     protected created() {
-        this.subscribe(this.githubService.profile$,
-            (profile: GitHubModel) => {
-                this.manipulateProfile(profile.items);
-                this.subjectHandler();
-            }
-        );
+        // this.subscribe(this.githubService.profile$,
+        //     (profile: GitHubModel) => {
+        //         this.manipulateProfile(profile.items);
+        //         this.subjectHandler();
+        //     }
+        // );
         // this.handleKindofSubject();
         // this.handleReplaySubject();
         // this.handleAsyncSubject();
@@ -40,7 +40,8 @@ export default class Casting extends BasicView {
         // this.multicasting();
         // this.publishing();
         // this.refCounting();
-        this.sharing();
+        // this.sharing();
+        this.handleScan();
     }
 
     private manipulateProfile(profile: Array<GitHubItemModel>) {
@@ -288,23 +289,64 @@ export default class Casting extends BasicView {
     }
 
     private sharing() {
-        const source$: Observable<any> = interval(500).pipe(
-            take(5),
-            tap(x => console.log(`tap ---> ${x}`))
+        // const source$: Observable<any> = interval(500).pipe(
+        //     take(5),
+        //     tap(x => console.log(`tap ---> ${x}`))
+        // );
+
+        // const share$: Observable<any> = source$.pipe(share());
+        // const share2$: Observable<any> = source$.pipe(
+        //     publish(),
+        //     refCount()
+        // );
+
+        // share2$.subscribe(x => console.log(`a = ${x}`));
+        // share2$.subscribe(x => console.log(`b = ${x}`));
+
+        // setTimeout(() => {
+        //     console.log('time out');
+        //     share2$.subscribe(x => console.log(`c = ${x}`));
+        // }, 3000);
+
+        const second1$ = interval(2000).pipe(take(1));
+        const second2$ = interval(1000).pipe(take(1));
+        
+        interval(1000).pipe(
+            take(1),
+            mergeMap(n => {
+                console.log('n1 =');
+                return second2$;
+            }),
+            tap(() => console.log('merge 1 complete')),
+            mergeMap(n => {
+                console.log('n2 =');
+                return second1$;
+            })
+        ).subscribe(
+            x => console.log('result = ', x),
+            e => console.log(e),
+            () => console.log('complete')
         );
 
-        const share$: Observable<any> = source$.pipe(share());
-        const share2$: Observable<any> = source$.pipe(
-            publish(),
-            refCount()
-        );
+        interval(1000).pipe(
+            take(4),
+            tap(x => console.log('s',x))
+        ).subscribe();
+    }
 
-        share2$.subscribe(x => console.log(`a = ${x}`));
-        share2$.subscribe(x => console.log(`b = ${x}`));
-
-        setTimeout(() => {
-            console.log('time out');
-            share2$.subscribe(x => console.log(`c = ${x}`));
-        }, 3000);
+    private handleScan() {
+        const increamemts$: Observable<number> = range(10).pipe(take(5));
+        increamemts$.pipe(
+            // reduce((acc, value, index) => {
+            //     acc.sum += value;
+            //     acc.ave = acc.sum / (index + 1);
+            //     return acc;
+            // }, {sum: 0, ave: 0})
+            scan((acc, value, index) => {
+                acc.sum += value;
+                acc.ave = acc.sum / (index + 1);
+                return acc;
+            }, {sum: 0, ave: 0})
+        ).subscribe(n => console.log('acc = ', n ));
     }
 }
