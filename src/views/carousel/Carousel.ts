@@ -1,6 +1,6 @@
 import {Component, Vue} from 'vue-property-decorator';
 import {fromEvent, Observable, Observer, Subscriber, OperatorFunction, interval, Subscription, SubscriptionLike, TeardownLogic, of, range, merge, from, asyncScheduler, asapScheduler, queueScheduler} from 'rxjs';
-import {map, takeUntil, mergeMap, switchMap, take, first, startWith, filter, withLatestFrom, tap, share, scan, pluck, subscribeOn, observeOn, animationFrameScheduler} from 'rxjs/operators';
+import {map, takeUntil, mergeMap, switchMap, take, first, startWith, filter, withLatestFrom, tap, share, scan, pluck, subscribeOn, observeOn} from 'rxjs/operators';
 import {lazyInject} from '@core/ServiceManager';
 import DependencyInjectId from '@/const/DependencyInjectId';
 import {ThroneService} from '@service/ThroneService';
@@ -10,7 +10,6 @@ import { GitHubModel } from '@/service/github/GitHubModel';
 import { GitHubItemModel } from '@/service/github/GitHubItemModel';
 import { USER_EVENT, SUPPORT_TOUCH, UserEventType } from '@/const/UserEvent';
 import {CarouselLimit} from '@/enum/CarouselLimit';
-import { async } from 'rxjs/internal/scheduler/async';
 
 interface UpdateStore {
     from?: number;
@@ -81,7 +80,6 @@ export default class Carousel extends BasicView {
             switchMap(drag => {
                 return end$.pipe(
                     map(event => drag),
-                    C
                     first()
                 );
             }),
